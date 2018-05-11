@@ -42,22 +42,29 @@ static void *spaceKey = &spaceKey;
     CGSize titleSize = self.titleLabel.bounds.size;
     CGSize imageSize = self.imageView.frame.size;
     
+    CGFloat spaceOffset = space/2.0;
+    
+    CGFloat imageWidthOffset = titleSize.width/2.0;
+    CGFloat imageHeightOffset = titleSize.height/2.0;
+    CGFloat titleWidthOffset = imageSize.width/2.0;
+    CGFloat titleHeightOffset = imageSize.height/2.0;
+    
     switch (type) {
         case UIButtonLayoutImageTop:
-            self.titleEdgeInsets = UIEdgeInsetsMake(imageSize.height + space, -imageSize.width, 0, 0);
-            self.imageEdgeInsets = UIEdgeInsetsMake(-(titleSize.height + space), titleSize.width, 0, 0);
+            self.titleEdgeInsets = UIEdgeInsetsMake(titleHeightOffset+space, -titleWidthOffset, -titleHeightOffset-spaceOffset, +titleWidthOffset);
+            self.imageEdgeInsets = UIEdgeInsetsMake(-imageHeightOffset-spaceOffset, imageWidthOffset, imageHeightOffset+spaceOffset, -imageWidthOffset);
             break;
         case UIButtonLayoutImageBottom:
-            self.titleEdgeInsets = UIEdgeInsetsMake(-(imageSize.height + space), -imageSize.width, 0, 0);
-            self.imageEdgeInsets = UIEdgeInsetsMake(titleSize.height + space, titleSize.width, 0, 0);
+            self.titleEdgeInsets = UIEdgeInsetsMake(-titleHeightOffset-spaceOffset, -titleWidthOffset, titleHeightOffset+spaceOffset, titleWidthOffset);
+            self.imageEdgeInsets = UIEdgeInsetsMake(imageHeightOffset+spaceOffset, imageWidthOffset, -imageHeightOffset-spaceOffset, -imageWidthOffset);
             break;
         case UIButtonLayoutImageLeft:
-            self.titleEdgeInsets = UIEdgeInsetsMake(0, space, 0, 0);
-            self.imageEdgeInsets = UIEdgeInsetsMake(0, -space, 0, 0);
+            self.titleEdgeInsets = UIEdgeInsetsMake(0, spaceOffset, 0, -spaceOffset);
+            self.imageEdgeInsets = UIEdgeInsetsMake(0, -spaceOffset, 0, spaceOffset);
             break;
         case UIButtonLayoutImageRight:
-            self.titleEdgeInsets = UIEdgeInsetsMake(0, -(2*imageSize.width + space), 0, 0);
-            self.imageEdgeInsets = UIEdgeInsetsMake(0, 2*titleSize.width + space, 0, 0);
+            self.titleEdgeInsets = UIEdgeInsetsMake(0, -2*titleWidthOffset - spaceOffset, 0, 2*titleWidthOffset + spaceOffset);
+            self.imageEdgeInsets = UIEdgeInsetsMake(0, 2*imageWidthOffset + spaceOffset, 0, -2*imageWidthOffset - spaceOffset);
             break;
         default:
             break;
