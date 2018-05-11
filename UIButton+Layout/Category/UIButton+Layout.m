@@ -11,6 +11,7 @@
 
 static void *typeKey = &typeKey;
 static void *spaceKey = &spaceKey;
+static void *sizeToFitKey = &sizeToFitKey;
 
 @interface UIButton ()
 
@@ -35,18 +36,25 @@ static void *spaceKey = &spaceKey;
 - (void)lzyLayoutSubviews{
     
     [self lzyLayoutSubviews];
-
+    
     UIButtonLayoutType type = self.type;
     CGFloat space = self.space;
     
     CGSize titleSize = self.titleLabel.bounds.size;
     CGSize imageSize = self.imageView.frame.size;
     
+    CGFloat fitOffset = 0;
+    if (self.isSizeToFit) {
+        [self.titleLabel sizeToFit];
+        CGSize fitTitleSize = self.titleLabel.bounds.size;
+        fitOffset = fitTitleSize.width - titleSize.width;
+    }
+    
     CGFloat spaceOffset = space/2.0;
     
     CGFloat imageWidthOffset = titleSize.width/2.0;
     CGFloat imageHeightOffset = titleSize.height/2.0;
-    CGFloat titleWidthOffset = imageSize.width/2.0;
+    CGFloat titleWidthOffset = imageSize.width/2.0 + fitOffset/2.0;
     CGFloat titleHeightOffset = imageSize.height/2.0;
     
     switch (type) {
@@ -74,16 +82,25 @@ static void *spaceKey = &spaceKey;
 - (void)setType:(UIButtonLayoutType)type{
     
     NSString *typeStr = [NSString stringWithFormat:@"%lu",(unsigned long)type];
-    objc_setAssociatedObject(self, &typeKey, typeStr, OBJC_ASSOCIATION_COPY);
+    objc_setAssociatedObject(self, &typeKey, typeStr, OBJC_ASSOCIATION_ASSIGN);
 }
 
 - (UIButtonLayoutType)type{
     return (UIButtonLayoutType)[objc_getAssociatedObject(self, &typeKey) integerValue];
 }
 
+- (void)setIsSizeToFit:(BOOL)isSizeToFit{
+    NSString *typeStr = [NSString stringWithFormat:@"%d",isSizeToFit];
+    objc_setAssociatedObject(self, &sizeToFitKey, typeStr, OBJC_ASSOCIATION_ASSIGN);
+}
+
+- (BOOL)isSizeToFit{
+    return [objc_getAssociatedObject(self, &sizeToFitKey) boolValue];
+}
+
 - (void)setSpace:(CGFloat)space{
     NSString *spaceStr = [NSString stringWithFormat:@"%f",space];
-    objc_setAssociatedObject(self, &spaceKey, spaceStr, OBJC_ASSOCIATION_COPY);
+    objc_setAssociatedObject(self, &spaceKey, spaceStr, OBJC_ASSOCIATION_ASSIGN);
 }
 
 - (CGFloat)space{

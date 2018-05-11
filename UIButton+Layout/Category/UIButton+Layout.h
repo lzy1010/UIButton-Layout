@@ -19,4 +19,9 @@ typedef NS_ENUM(NSUInteger, UIButtonLayoutType) {
 
 - (void)setImageLayout:(UIButtonLayoutType)type space:(CGFloat)space;
 
+/**
+ titleLabel是否自适应宽度
+ */
+@property (assign, nonatomic) BOOL isSizeToFit;
+
 @end
