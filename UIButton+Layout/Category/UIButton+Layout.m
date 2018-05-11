@@ -9,14 +9,14 @@
 #import "UIButton+Layout.h"
 #import <objc/runtime.h>
 
-static void *typeKey = &typeKey;
-static void *spaceKey = &spaceKey;
-static void *sizeToFitKey = &sizeToFitKey;
+static void *infoDicKey = &infoDicKey;
 
 @interface UIButton ()
 
+@property (strong, nonatomic) NSMutableDictionary *infoDic;
 @property (assign, nonatomic) UIButtonLayoutType type;
 @property (assign, nonatomic) CGFloat space;
+@property (assign, nonatomic) BOOL support;
 
 @end
 
@@ -29,13 +29,23 @@ static void *sizeToFitKey = &sizeToFitKey;
 }
 
 - (void)setImageLayout:(UIButtonLayoutType)type space:(CGFloat)space{
-    self.type = type;
-    self.space = space;
+    [self.infoDic setValue:@(type) forKey:@"type"];
+    [self.infoDic setValue:@(space) forKey:@"space"];
+    [self.infoDic setValue:@true forKey:@"support"];
+    
+    objc_setAssociatedObject(self, &infoDicKey, self.infoDic, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (void)lzyLayoutSubviews{
     
     [self lzyLayoutSubviews];
+    
+    if (!self.support) {
+        if (self.isSizeToFit) {
+            [self.titleLabel sizeToFit];
+        }
+        return;
+    }
     
     UIButtonLayoutType type = self.type;
     CGFloat space = self.space;
@@ -79,32 +89,36 @@ static void *sizeToFitKey = &sizeToFitKey;
     }
 }
 
-- (void)setType:(UIButtonLayoutType)type{
-    
-    NSString *typeStr = [NSString stringWithFormat:@"%lu",(unsigned long)type];
-    objc_setAssociatedObject(self, &typeKey, typeStr, OBJC_ASSOCIATION_ASSIGN);
-}
-
-- (UIButtonLayoutType)type{
-    return (UIButtonLayoutType)[objc_getAssociatedObject(self, &typeKey) integerValue];
-}
-
 - (void)setIsSizeToFit:(BOOL)isSizeToFit{
-    NSString *typeStr = [NSString stringWithFormat:@"%d",isSizeToFit];
-    objc_setAssociatedObject(self, &sizeToFitKey, typeStr, OBJC_ASSOCIATION_ASSIGN);
+    [self.infoDic setValue:@(isSizeToFit) forKey:@"isSizeToFit"];
+    objc_setAssociatedObject(self, &infoDicKey, self.infoDic, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 - (BOOL)isSizeToFit{
-    return [objc_getAssociatedObject(self, &sizeToFitKey) boolValue];
-}
-
-- (void)setSpace:(CGFloat)space{
-    NSString *spaceStr = [NSString stringWithFormat:@"%f",space];
-    objc_setAssociatedObject(self, &spaceKey, spaceStr, OBJC_ASSOCIATION_ASSIGN);
+    return [self.infoDic[@"isSizeToFit"] boolValue];
 }
 
 - (CGFloat)space{
-    return [objc_getAssociatedObject(self, &spaceKey) floatValue];
+    return [self.infoDic[@"space"] floatValue];
 }
+
+- (UIButtonLayoutType)type{
+    return (UIButtonLayoutType)[self.infoDic[@"type"] integerValue];
+}
+
+- (BOOL)support{
+    return [self.infoDic[@"support"] boolValue];
+}
+
+- (NSMutableDictionary *)infoDic{
+    NSMutableDictionary *infoDic = objc_getAssociatedObject(self, &infoDicKey);
+    if (!infoDic) {
+        infoDic = [@{@"type":@(UIButtonLayoutImageLeft),@"space":@0,@"isSizeToFit":@false,@"support":@false} mutableCopy];
+        objc_setAssociatedObject(self, &infoDicKey, infoDic, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    
+    return infoDic;
+}
+
 
 @end

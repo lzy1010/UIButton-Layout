@@ -29,7 +29,8 @@
         [btn setTitle:@"哈哈哈haha\nha" forState:UIControlStateNormal];
         [btn setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
         btn.titleLabel.font = [UIFont systemFontOfSize:25];
-        [btn setImageLayout:UIButtonLayoutImageTop space:10];
+        
+        [btn setImageLayout:UIButtonLayoutImageBottom space:10];
         btn.isSizeToFit = true;
         
         btn;
